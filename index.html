@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>We've Solved All of This Before — Lessons from Systems Engineering for the Age of AI Agents</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f0f0d;
+    --surface: #171714;
+    --surface2: #1e1e1a;
+    --border: #2a2a26;
+    --border2: #363630;
+    --text: #e8e4d8;
+    --muted: #7a7870;
+    --dim: #4a4844;
+    --accent: #e8c547;
+    --accent2: #c47a3a;
+    --green: #4caf7d;
+    --red: #e05a4a;
+    --blue: #4a9fd4;
+    --mono-bg: #0a0a08;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 18px; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.78;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+  .nav-sep { color: var(--dim); font-size: 0.75rem; }
+  .nav-item {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .reading-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--dim);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 6rem 2.5rem 4rem;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .eyebrow-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 0.22rem 0.65rem;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .eyebrow-sep { color: var(--dim); }
+  .eyebrow-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 1.75rem;
+  }
+  h1 .accent { color: var(--accent); }
+
+  .standfirst {
+    font-size: 1.15rem;
+    font-weight: 300;
+    color: #b0ac9e;
+    line-height: 1.65;
+    max-width: 660px;
+    margin-bottom: 3rem;
+    font-style: italic;
+  }
+
+  .byline-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .byline-left { display: flex; align-items: center; gap: 0.85rem; }
+  .avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+  .byline-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .byline-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .share-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  /* ── Body ── */
+  article {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 4rem 2.5rem 8rem;
+  }
+
+  p { margin-bottom: 1.45rem; color: #c8c4b8; }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text);
+    margin: 4rem 0 1.1rem;
+  }
+
+  h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 2.5rem 0 0.6rem;
+    font-weight: 500;
+  }
+
+  strong { font-weight: 500; color: var(--text); font-style: normal; }
+  em { font-style: italic; color: #d0ccc0; }
+
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ── Comparison block ── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin: 2rem 0 2.5rem;
+    overflow: hidden;
+  }
+  .compare-col {
+    padding: 1.4rem 1.6rem;
+  }
+  .compare-col:first-child {
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .compare-col:last-child {
+    background: var(--surface2);
+  }
+  .compare-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+  }
+  .compare-col:first-child .compare-header { color: var(--muted); }
+  .compare-col:last-child .compare-header { color: var(--accent); }
+  .compare-item {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #a8a49c;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+  }
+  .compare-item:last-child { border-bottom: none; }
+  .compare-item strong { color: var(--text); font-style: normal; }
+
+  /* ── Pull quote ── */
+  .pullquote {
+    border-left: 3px solid var(--accent);
+    padding: 0.5rem 1.75rem;
+    margin: 2.5rem 0;
+  }
+  .pullquote p {
+    font-size: 1.25rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── Code ── */
+  pre {
+    background: var(--mono-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.4rem 1.6rem;
+    overflow-x: auto;
+    margin: 1.75rem 0;
+    position: relative;
+  }
+  pre .lang-badge {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: #c8e0a8;
+  }
+  pre code { display: block; }
+  p code, li code {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.45em;
+    border-radius: 3px;
+    font-size: 0.8em;
+    color: #a8d888;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--green);
+    border-radius: 0 4px 4px 0;
+    padding: 1.25rem 1.6rem;
+    margin: 2rem 0;
+  }
+  .callout.warn { border-left-color: var(--accent2); }
+  .callout.danger { border-left-color: var(--red); }
+  .callout-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+  .callout.warn .callout-label { color: var(--accent2); }
+  .callout.danger .callout-label { color: var(--red); }
+  .callout:not(.warn):not(.danger) .callout-label { color: var(--green); }
+  .callout p { font-size: 0.88rem; line-height: 1.6; margin: 0; color: #a8a49c; }
+
+  /* ── Analogy section marker ── */
+  .analogy-marker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 4rem 0 0;
+  }
+  .analogy-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    color: var(--border2);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 3rem;
+    text-align: right;
+  }
+  .analogy-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Section break ── */
+  .section-break {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 3.5rem 0;
+    color: var(--dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .section-break::before, .section-break::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Analogy title ── */
+  .analogy-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.55rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin: 0.5rem 0 1rem;
+  }
+  .analogy-title .old { color: var(--muted); }
+  .analogy-title .arrow { color: var(--accent); margin: 0 0.4rem; }
+  .analogy-title .new { color: var(--accent); }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 2.5rem;
+    max-width: 860px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+  }
+  .footer-bio {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+  .footer-bio a { color: var(--accent); }
+  .footer-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end; }
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 2rem; }
+    article { padding: 2.5rem 1.5rem 5rem; }
+    .hero { padding: 3.5rem 1.5rem 2.5rem; }
+    .topbar { padding: 0.8rem 1.5rem; }
+    .compare { grid-template-columns: 1fr; }
+    .compare-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    footer { grid-template-columns: 1fr; }
+    .footer-tags { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">SYSTEMS//AI</span>
+    <span class="nav-sep">—</span>
+    <span class="nav-item">Guest Essay</span>
+  </div>
+  <span class="reading-time">14 min read</span>
+</div>
+
+<div class="hero">
+  <div class="eyebrow">
+    <span class="eyebrow-tag">Deep Dive</span>
+    <span class="eyebrow-sep">·</span>
+    <span class="eyebrow-date">May 2026</span>
+  </div>
+  <h1>We've Solved<br>All of This <span class="accent">Before</span></h1>
+  <p class="standfirst">
+    Garbage collection, memory safety, process isolation, race conditions, trust boundaries — the hardest problems in AI engineering today are not new problems. They're old problems wearing new clothes. Here's what 50 years of systems programming has to teach us about building agents that last.
+  </p>
+  <div class="byline-row">
+    <div class="byline-left">
+      <div class="avatar-circle">V</div>
+      <div>
+        <div class="byline-name">VSJ</div>
+        <div class="byline-sub">Agentic systems builder</div>
+      </div>
+    </div>
+    <span class="share-label">Agentic Systems · Guest Essay</span>
+  </div>
+</div>
+
+<article>
+
+  <p>
+    There's a peculiar kind of amnesia that grips every new generation of technology. We declare a paradigm shift, tear up the old rulebooks, and spend years rediscovering constraints that the previous generation already mapped, named, and solved — or learned to live with.
+  </p>
+
+  <p>
+    AI engineering is deep in that phase right now. The problems showing up in production agentic systems — degraded context, confused shared state, unauditable behaviour, privilege escalation, coordination failures — are not novel. They are, almost without exception, problems that systems engineers have been solving since the 1970s. The solutions are often there. We just haven't applied them.
+  </p>
+
+  <p>
+    I've spent the past year building and running agentic systems daily: a persistent memory engine in Rust, an autonomous engineering pipeline, a task-routing system, a nightly memory maintenance process. The problems I kept hitting weren't AI problems. They were systems problems. Here's what classical engineering has to teach us.
+  </p>
+
+  <div class="section-break">The Analogies</div>
+
+  <!-- 1. Garbage Collection -->
+  <div class="analogy-marker">
+    <span class="analogy-number">01</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Garbage Collection</span><span class="arrow">→</span><span class="new">Memory Lifecycle Management</span></h2>
+
+  <p>
+    Before garbage collection, C programmers managed memory manually. <code>malloc</code> to allocate, <code>free</code> to release. Forget to free something and it leaks. Free something still in use and you corrupt your program. The solution — automated tracking of what's live, what's dead, and periodic collection — is one of the great engineering contributions of the last century.
+  </p>
+
+  <p>
+    Now consider a persistent AI memory store running across multiple agents over months of daily use. Facts accumulate. Some are accessed constantly; some were written once in January about a project that was scrapped. All of them sit in the store with equal weight. Every agent that reads from this store is implicitly treating a stale, invalidated fact as equivalent to a freshly confirmed one.
+  </p>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-header">Classical GC Problem</div>
+      <div class="compare-item"><strong>Memory leak</strong> — objects accumulate, never freed</div>
+      <div class="compare-item"><strong>Dangling pointer</strong> — reference to freed memory still used</div>
+      <div class="compare-item"><strong>Reference counting</strong> — track how often a value is used</div>
+      <div class="compare-item"><strong>Generational GC</strong> — old objects scrutinised more than young</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header">AI Memory Equivalent</div>
+      <div class="compare-item"><strong>Memory bloat</strong> — stale facts accumulate indefinitely</div>
+      <div class="compare-item"><strong>Stale retrieval</strong> — invalidated memory still retrieved as truth</div>
+      <div class="compare-item"><strong>Access frequency</strong> — hot memories promoted; cold ones flagged</div>
+      <div class="compare-item"><strong>Confidence decay</strong> — old, low-recall memories decay first</div>
+    </div>
+  </div>
+
+  <p>
+    The solution I've been running is a nightly process — memory-dreamer — that snapshots the full memory database, runs analytics across access frequency and age, promotes heavily-used memories, invalidates cold ones, and propagates confidence decay through the knowledge graph when something is marked stale. It's garbage collection for a memory palace.
+  </p>
+
+  <div class="callout">
+    <div class="callout-label">Key Principle</div>
+    <p>Every memory system needs a lifecycle. Capture without collection is just structured confusion. A memory your agent confidently retrieves is implicitly more trusted than one it doesn't — so anything left in the store long enough becomes implicitly authoritative, whether it deserves to be or not.</p>
+  </div>
+
+  <!-- 2. Memory Safety -->
+  <div class="analogy-marker">
+    <span class="analogy-number">02</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Memory Safety & Ownership</span><span class="arrow">→</span><span class="new">Context Ownership in Shared Agent Memory</span></h2>
+
+  <p>
+    Rust's borrow checker enforces a simple rule: one owner, one mutable reference at a time. This eliminates a whole class of bugs — data races, use-after-free, double-free — by making the compiler reject code that would produce them. The elegance isn't in the constraint; it's in making the constraint unambiguous.
+  </p>
+
+  <p>
+    Now run three agents writing to a shared memory store simultaneously. Agent A records a decision about the auth module. Agent B, one second later, records a conflicting decision about the same module based on slightly older context. Agent C reads both in the same retrieval. What does it believe?
+  </p>
+
+  <p>
+    Nobody owns that memory. Nobody knows who last wrote it or why. The store has no concept of provenance. In systems terms, this is a write race on shared mutable state — one of the oldest, nastiest categories of bug in concurrent programming.
+  </p>
+
+  <pre><code><span class="lang-badge">rust analogy</span>
+// In Rust: only one writer allowed. Compiler enforces it.
+let mut memory = MemoryStore::new();
+let writer_a = &mut memory;  // OK
+let writer_b = &mut memory;  // COMPILE ERROR — already borrowed
+
+// In naive multi-agent systems: both just write.
+// No ownership model. Last writer wins. Silently.
+agent_a.write("auth module uses JWT");
+agent_b.write("auth module uses sessions");
+// Ground truth is now ambiguous. No error raised.</code></pre>
+
+  <p>
+    The fix borrows from both Rust and database design: writes to shared memory should carry provenance (which agent, which session, which timestamp, with what confidence). Conflicting writes should be surfaced, not silently overwritten. Retrieval logic should prefer the most-recently-confirmed version from the most-trusted source.
+  </p>
+
+  <!-- 3. Security -->
+  <div class="analogy-marker">
+    <span class="analogy-number">03</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Security & Trust Boundaries</span><span class="arrow">→</span><span class="new">Prompt Injection & Agent Trust</span></h2>
+
+  <p>
+    SQL injection. Buffer overflows. Cross-site scripting. Every major class of security vulnerability from the past three decades follows the same structure: untrusted input reaches a context where it's interpreted as trusted instruction. The solution, every time, is the same: never conflate data with code. Sanitise at the boundary. Enforce least privilege.
+  </p>
+
+  <p>
+    Prompt injection is SQL injection for language models. An adversary embeds instructions inside content the agent will read — a webpage, an email, a document, a tool result — and the agent, lacking a principled boundary between <em>data it is processing</em> and <em>instructions it should follow</em>, executes them.
+  </p>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-header">Classical Security Pattern</div>
+      <div class="compare-item"><strong>SQL injection</strong> — untrusted input in query context</div>
+      <div class="compare-item"><strong>Buffer overflow</strong> — untrusted data overruns instruction space</div>
+      <div class="compare-item"><strong>Privilege escalation</strong> — low-trust process gains high-trust access</div>
+      <div class="compare-item"><strong>Sandboxing</strong> — untrusted code runs with constrained permissions</div>
+      <div class="compare-item"><strong>Audit log</strong> — every privileged action traced and reviewable</div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header">AI Agent Equivalent</div>
+      <div class="compare-item"><strong>Prompt injection</strong> — instructions embedded in observed content</div>
+      <div class="compare-item"><strong>Context overflow</strong> — injected content displaces real instructions</div>
+      <div class="compare-item"><strong>Jailbreak / role confusion</strong> — agent tricked into acting beyond scope</div>
+      <div class="compare-item"><strong>Tool scope limits</strong> — agents run with constrained action sets</div>
+      <div class="compare-item"><strong>Action tracing</strong> — every tool call logged with rationale</div>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-label">The Uncomfortable Truth</div>
+    <p>We do not yet have a principled, general solution to prompt injection the way parameterised queries solved SQL injection. The closest we have is defence-in-depth: structured parsing of tool outputs, explicit trust levels on data sources, human-in-the-loop gates before irreversible actions, and agent scope restriction. It's 1998-era security thinking. We need our prepared statements moment.</p>
+  </div>
+
+  <p>
+    The human approval gate in my eng-crew pipeline is, at its core, a security control. Before any code is executed — before the blast radius matters — a human reviews the plan. It's the AI equivalent of a firewall rule review before a deployment. Tedious to implement, critical to trust.
+  </p>
+
+  <!-- 4. Concurrency -->
+  <div class="analogy-marker">
+    <span class="analogy-number">04</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Concurrency & Race Conditions</span><span class="arrow">→</span><span class="new">Parallel Agent Coordination</span></h2>
+
+  <p>
+    Distributed systems engineers know that two processes updating the same resource without coordination will, eventually, corrupt it. Mutexes, semaphores, compare-and-swap, optimistic locking, event sourcing — decades of tooling exist specifically because concurrent mutation of shared state is hard to get right.
+  </p>
+
+  <p>
+    Multi-agent pipelines are distributed systems. When I run four parallel coder agents on separate subtasks in eng-crew, they each have opinions about the state of the codebase. They may modify the same files. One agent's plan may assume a function signature that another agent is in the process of changing.
+  </p>
+
+  <pre><code><span class="lang-badge">conceptual</span>
+// Classical deadlock
+Thread A holds Lock X, waits for Lock Y
+Thread B holds Lock Y, waits for Lock X
+→ deadlock.
+
+// Agent equivalent
+Agent A: "I'll refactor the auth module once the API layer is settled"
+Agent B: "I'll settle the API layer once auth module types are final"
+→ both blocked. No error. Just silence and missed deadlines.</code></pre>
+
+  <p>
+    The decisions MCP server I built is a partial answer to this: it ranks tasks and routes agents based on dependencies, ensuring agents work in an order that respects what each one needs from the others. It's a scheduler. Distributed systems have had schedulers for a long time. We're reinventing them for agents.
+  </p>
+
+  <!-- 5. Cache Invalidation -->
+  <div class="analogy-marker">
+    <span class="analogy-number">05</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Cache Invalidation</span><span class="arrow">→</span><span class="new">Knowledge Graph Staleness</span></h2>
+
+  <p>
+    Phil Karlton's famous quip — that naming things and cache invalidation are the two hardest problems in computer science — has aged well. The reason cache invalidation is hard isn't the invalidation itself; it's the dependency graph. Invalidate fact A, and everything that was derived from fact A may now be wrong. But you have to know what depended on A to know what else needs invalidating.
+  </p>
+
+  <p>
+    In a persistent agent memory store, this problem is structural. A memory about a module's architecture is linked to memories about its API surface, its test strategy, its deployment configuration. If the architecture changes and that root memory is invalidated, the downstream memories don't automatically inherit the invalidation. They become quietly wrong — confidently cached, subtly stale.
+  </p>
+
+  <div class="pullquote">
+    <p>The answer is a knowledge graph with typed edges and a confidence propagation model — so that invalidating a parent node decays the confidence of everything downstream, weighted by edge strength and traversal distance.</p>
+  </div>
+
+  <p>
+    The rusty-mempalace architecture supports exactly this: memories are nodes, relationships are typed edges, and the nightly maintenance process propagates confidence decay through the graph when something upstream is invalidated. It's cache invalidation. It just took a while to recognise it as such.
+  </p>
+
+  <!-- 6. Process Isolation -->
+  <div class="analogy-marker">
+    <span class="analogy-number">06</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Process Isolation & Sandboxing</span><span class="arrow">→</span><span class="new">Agent Scope & Blast Radius</span></h2>
+
+  <p>
+    Modern operating systems give each process its own address space. A buggy process can crash itself without corrupting memory used by other processes. It can be killed without bringing down the system. The blast radius of a failure is contained by design.
+  </p>
+
+  <p>
+    Agentic systems often have the opposite property: a single agent with broad tool access and no scope limits can read and write across the entire environment it operates in. A misunderstanding, a bad plan, a prompt injection attack — any of these can produce actions whose blast radius is the entire project, codebase, or data store.
+  </p>
+
+  <p>
+    Scope restriction is the agent equivalent of process isolation: the architect agent may think broadly but should not execute. The coder agent executes but only on files within its assigned subtask. The reviewer reads broadly but writes nothing. Different agents, different permission sets, hard limits enforced — not by convention, but by the infrastructure.
+  </p>
+
+  <div class="callout danger">
+    <div class="callout-label">Anti-Pattern to Avoid</div>
+    <p>Giving every agent full tool access because it's easier to configure. This is the equivalent of running everything as root. It works until it doesn't, and when it doesn't, the failure is total. Design the minimal permission set each agent needs for its specific role. Treat broad access as a code smell.</p>
+  </div>
+
+  <!-- 7. Observability -->
+  <div class="analogy-marker">
+    <span class="analogy-number">07</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Logging & Observability</span><span class="arrow">→</span><span class="new">Agent Action Tracing</span></h2>
+
+  <p>
+    The observability movement in software engineering made a simple argument: a system you can't inspect is a system you can't trust in production. Structured logs, distributed tracing, metrics, alerting — these aren't features you add after deployment. They're the difference between a system you operate and one you just hope works.
+  </p>
+
+  <p>
+    Most agentic systems today have poor observability by default. You know what task you gave an agent. You may know what output it produced. The reasoning chain in between — what it retrieved, what it considered, what alternatives it discarded, which tool call triggered which downstream action — is often a black box. When something goes wrong, the debugging experience is close to reading tea leaves.
+  </p>
+
+  <p>
+    The eng-crew dashboard is a partial answer: every agent action, subtask assignment, approval event, and execution step is visible in real time. It's structured tracing for an engineering pipeline. But the field is far behind where distributed systems observability was in 2015, let alone 2025. We need agent-native OpenTelemetry. We don't have it yet.
+  </p>
+
+  <!-- 8. Type Systems -->
+  <div class="analogy-marker">
+    <span class="analogy-number">08</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Type Systems & Contracts</span><span class="arrow">→</span><span class="new">Structured Outputs & Schema Enforcement</span></h2>
+
+  <p>
+    A type system is a formal contract between a function and its callers. It says: this function accepts these shapes of data and returns that shape. Violations are caught at compile time, not at 3am when a production system sends a string where an integer was expected.
+  </p>
+
+  <p>
+    Language models produce freeform text. When an agent in a pipeline produces output that the next agent needs to parse, you have the equivalent of a dynamically typed interface between components — one that can fail at runtime in unexpected ways. Structured outputs (JSON schema enforcement, constrained generation) are type systems for agent interfaces.
+  </p>
+
+  <pre><code><span class="lang-badge">pseudo-schema</span>
+// Without schema enforcement (untyped interface)
+architect_output = "Here's my plan: fix the auth flow, 
+                    update the API, add some tests..."
+// Downstream parser: good luck.
+
+// With schema enforcement (typed interface)
+architect_output = {
+  "subtasks": [
+    { "id": "auth-1", "description": "...", "agent": "coder", 
+      "dependencies": [], "estimated_tokens": 2000 }
+  ],
+  "total_budget_usd": 1.20
+}
+// Downstream agent: valid, parseable, routable.</code></pre>
+
+  <p>
+    The eng-crew pipeline enforces structured output at every agent boundary. The architect produces a validated schema. The coder agents receive typed subtasks. The reviewer returns a typed evaluation. The contracts are explicit. The failures, when they happen, are predictable.
+  </p>
+
+  <!-- 9. Dependency Management -->
+  <div class="analogy-marker">
+    <span class="analogy-number">09</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Dependency Management</span><span class="arrow">→</span><span class="new">Model Versioning & Prompt Stability</span></h2>
+
+  <p>
+    Dependency hell is what happens when your software relies on libraries that rely on other libraries, and upgrading one breaks another in ways that aren't immediately obvious. The solution — package locks, semantic versioning, reproducible builds — is about making the environment of a build explicit and reproducible.
+  </p>
+
+  <p>
+    AI pipelines have an equivalent: model versions, prompt versions, and the interaction between them. A prompt tuned for Claude Sonnet 3.7 may behave differently on Claude Sonnet 4. A system prompt that produces reliable structured output today may stop doing so after a silent model update. The "dependency" — the model — is opaque, continuously updated, and not under your control.
+  </p>
+
+  <p>
+    The emerging best practice is treating prompts as versioned artefacts, pinning model versions in production pipelines, and running eval suites on upgrade. It's dependency management for an environment where the dependency is a neural network. The tooling is embryonic. The need is the same age as software itself.
+  </p>
+
+  <!-- 10. Build Systems / CI -->
+  <div class="analogy-marker">
+    <span class="analogy-number">10</span>
+    <span class="analogy-line"></span>
+  </div>
+  <h2 class="analogy-title"><span class="old">Build Systems & CI/CD</span><span class="arrow">→</span><span class="new">Agent Pipeline Orchestration & Evals</span></h2>
+
+  <p>
+    A good CI pipeline doesn't just run tests — it establishes what "correct" means for a codebase, and gates all changes against that standard. The combination of reproducible builds, automated tests, and deployment gates is what makes large-scale collaborative software development tractable.
+  </p>
+
+  <p>
+    Agentic pipelines need the same thing. Not just a sequence of agent calls, but a formal definition of correctness at each stage, automated checks before promotion, and rollback paths when an output fails. The architect → critic → approval gate → coder → reviewer → executor sequence in eng-crew is, structurally, a CI pipeline. The approval gate is a required review. The reviewer is an automated test suite. The executor is a deployment.
+  </p>
+
+  <div class="pullquote">
+    <p>The human approval gate is not a limitation of autonomous AI. It is the CI gate — the deliberate, designed moment where human judgment is applied before an irreversible change propagates.</p>
+  </div>
+
+  <div class="section-break">The Synthesis</div>
+
+  <h2>What This All Points To</h2>
+
+  <p>
+    Across all ten of these analogies, the same pattern recurs: the AI engineering community is rediscovering, under different terminology, constraints that systems engineers have been navigating for decades. This isn't a criticism. Every technology generation has to earn its own understanding of the problem space. But it does suggest an opportunity.
+  </p>
+
+  <p>
+    The engineers who built garbage collectors, the researchers who designed Rust's borrow checker, the architects who created SQL parameterisation — they thought carefully about the failure modes of their systems at scale, over time, under adversarial conditions. Their solutions weren't intuitive; they were the product of seeing what happens when the naïve approach meets real production use.
+  </p>
+
+  <p>
+    We're at the naïve approach phase for AI agents. The production failures are starting to arrive. The next few years will produce the parameterised queries, the garbage collectors, the borrow checkers of agentic AI — formal solutions to the structural problems we keep stumbling into.
+  </p>
+
+  <p>
+    In the meantime, the fastest path to building AI systems that work reliably over time is to resist the amnesia. Ask what this problem is analogous to. Check whether it's been solved before. Build on that foundation rather than rediscovering it from first principles.
+  </p>
+
+  <p>
+    Memory needs a lifecycle. Shared state needs ownership semantics. Inputs need trust boundaries. Parallel agents need coordination models. Action scopes need enforcement. Systems need observability. Agent interfaces need contracts. These aren't AI insights. They're engineering insights. They apply here too.
+  </p>
+
+
+
+</article>
+
+<footer>
+  <div class="footer-bio">
+    Written by VSJ · agentic systems builder<br>
+    Building agentic infrastructure and autonomous engineering systems.
+  </div>
+  <div class="footer-tags">
+    <span class="tag">Systems Engineering</span>
+    <span class="tag">Agentic AI</span>
+    <span class="tag">Memory</span>
+    <span class="tag">Security</span>
+    <span class="tag">Architecture</span>
+  </div>
+</footer>
+
+</body>
+</html>
